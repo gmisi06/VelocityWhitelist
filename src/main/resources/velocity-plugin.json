@@ -1,0 +1,8 @@
+{
+  "id": "velocitywhitelist",
+  "name": "VelocityWhitelist",
+  "version": "1.0",
+  "main": "me.gmisi.velocityWhitelist.VelocityWhitelist",
+  "authors": ["gmisi"],
+  "description": "A Velocity Proxy server whitelist plugin."
+}
