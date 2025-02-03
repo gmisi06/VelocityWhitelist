@@ -32,12 +32,13 @@ public class AddCommand implements VelocitySubCommand {
 
     @Override
     public LiteralCommandNode<CommandSource> getNode() {
+
         return LiteralArgumentBuilder.<CommandSource>literal("add")
                 .executes(context -> {
                     CommandSource source = context.getSource();
 
                     source.sendMessage((serializer.deserialize(VelocityWhitelist.PREFIX)));
-                    source.sendMessage((serializer.deserialize("&7/vwl add <player> <server> - Add player to the specified server's whitelist.")));
+                    source.sendMessage((serializer.deserialize(VelocityWhitelist.getLang().getString("add-success"))));
 
                     return Command.SINGLE_SUCCESS;
                 })
@@ -73,12 +74,14 @@ public class AddCommand implements VelocitySubCommand {
                                     String serverName = context.getArgument("server", String.class);
 
                                     if (!config.contains("servers." + serverName)) {
-                                        source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " &cThe server '" + serverName + "' does not exist."));
+                                        source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("server-not-exists")
+                                                .replace("{server}", serverName)));
                                         return Command.SINGLE_SUCCESS;
                                     }
 
                                     if (!source.hasPermission(CommandHandler.PERMISSION_ROOT + ".add.*") && !source.hasPermission(CommandHandler.PERMISSION_ROOT + ".add." + serverName)) {
-                                        source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " &cYou do not have permission to add players to the " + serverName + " whitelist."));
+                                        source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " " +VelocityWhitelist.getLang().getString("add-no-perm")
+                                                .replace("{server}", serverName)));
                                         return Command.SINGLE_SUCCESS;
                                     }
 
@@ -94,13 +97,14 @@ public class AddCommand implements VelocitySubCommand {
                                         config.update();
                                         config.save();
 
-                                        source.sendMessage((serializer.deserialize(VelocityWhitelist.PREFIX + " &7You have successfully &aadded &7" + playerName + " to the " + serverName + " server whitelist.")));
+                                        source.sendMessage((serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("add-success")
+                                                .replace("{server}", serverName)
+                                                .replace("{player}", playerName))));
                                     } catch (Exception e) {
-                                        source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " &cAn error occurred while modifying the configuration."));
+                                        source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("modification-error")));
                                     }
 
                                     return Command.SINGLE_SUCCESS;
-
                                 }))
                 )
                 .build();

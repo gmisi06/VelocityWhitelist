@@ -3,7 +3,6 @@ package me.gmisi.velocityWhitelist.listeners;
 import com.velocitypowered.api.event.ResultedEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.LoginEvent;
-import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.proxy.Player;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import me.gmisi.velocityWhitelist.VelocityWhitelist;
@@ -29,7 +28,7 @@ public class LoginListener {
             Player player = event.getPlayer();
 
             if (!whitelisted.contains(player.getUsername()) && !(player.hasPermission(CommandHandler.PERMISSION_ROOT + ".bypass"))) {
-                event.setResult(ResultedEvent.ComponentResult.denied(serializer.deserialize( VelocityWhitelist.PREFIX + " &cYou are not on the whitelist.")));
+                event.setResult(ResultedEvent.ComponentResult.denied(serializer.deserialize( VelocityWhitelist.PREFIX + " " + config.getString("proxy-kick-message"))));
             }
         }
     }

@@ -32,12 +32,13 @@ public class RemoveCommand implements VelocitySubCommand {
     
     @Override
     public LiteralCommandNode<CommandSource> getNode() {
+
         return LiteralArgumentBuilder.<CommandSource>literal("remove")
                 .executes(context -> {
                     CommandSource source = context.getSource();
 
                     source.sendMessage((serializer.deserialize(VelocityWhitelist.PREFIX)));
-                    source.sendMessage((serializer.deserialize("&7/vwl remove <player> <server> - Remove player from the specified server's whitelist.")));
+                    source.sendMessage((serializer.deserialize(VelocityWhitelist.getLang().getString("help-remove"))));
 
                     return Command.SINGLE_SUCCESS;
                 })
@@ -78,12 +79,16 @@ public class RemoveCommand implements VelocitySubCommand {
                                     String serverName = context.getArgument("server", String.class);
 
                                     if (!config.contains("servers." + serverName)) {
-                                        source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " &cThe server '" + serverName + "' does not exist."));
+                                        source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("server-not-exists")
+                                                .replace("{server}", serverName)
+                                        ));
                                         return Command.SINGLE_SUCCESS;
                                     }
 
                                     if (!source.hasPermission(CommandHandler.PERMISSION_ROOT + ".remove.*") && !source.hasPermission(CommandHandler.PERMISSION_ROOT + ".remove." + serverName)) {
-                                        source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " &cYou do not have permission to remove players from the " + serverName + " whitelist."));
+                                        source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("remove-no-perm")
+                                                .replace("{server}", serverName)
+                                        ));
                                         return Command.SINGLE_SUCCESS;
                                     }
 
@@ -96,10 +101,13 @@ public class RemoveCommand implements VelocitySubCommand {
                                         config.update();
                                         config.save();
 
-                                        source.sendMessage((serializer.deserialize(VelocityWhitelist.PREFIX + " &7You have successfully &cremoved &7" + playerName + " from the " + serverName + " server whitelist.")));
+                                        source.sendMessage((serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("remove-success")
+                                                .replace("{server}", serverName)
+                                                .replace("{player}", playerName)
+                                        )));
 
                                     } catch (Exception e) {
-                                        source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " &cAn error occurred while modifying the configuration."));
+                                        source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("modification-error")));
                                     }
 
                                     return Command.SINGLE_SUCCESS;

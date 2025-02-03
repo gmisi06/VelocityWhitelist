@@ -24,7 +24,7 @@ public class LanguageManager {
         File langFile = new File(dataDirectory.toFile(), "lang/lang_" + type + ".yml");
         langConfig = YamlDocument.create(
                 langFile,
-                Objects.requireNonNull(getClass().getResourceAsStream("/lang_" + type + ".yml")),
+                Objects.requireNonNull(getClass().getResourceAsStream("/lang/lang_" + type + ".yml")),
                 GeneralSettings.DEFAULT,
                 LoaderSettings.builder()
                         .setAutoUpdate(false)

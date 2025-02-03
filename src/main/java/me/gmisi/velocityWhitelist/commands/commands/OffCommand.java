@@ -28,12 +28,13 @@ public class OffCommand implements VelocitySubCommand {
 
     @Override
     public LiteralCommandNode<CommandSource> getNode() {
+
         return LiteralArgumentBuilder.<CommandSource>literal("off")
                 .executes(context -> {
                     CommandSource source = context.getSource();
 
                     source.sendMessage((serializer.deserialize(VelocityWhitelist.PREFIX )));
-                    source.sendMessage((serializer.deserialize("&7/vwl off <server> - Turn off the whitelist on the specified server.")));
+                    source.sendMessage((serializer.deserialize(VelocityWhitelist.getLang().getString("help-off"))));
 
                     return Command.SINGLE_SUCCESS;
                 })
@@ -58,12 +59,14 @@ public class OffCommand implements VelocitySubCommand {
                             String serverName = context.getArgument("server", String.class);
 
                             if (!config.contains("servers." + serverName)) {
-                                source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " &cThe server '" + serverName + "' does not exist."));
+                                source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("server-not-exists")
+                                        .replace("{server}", serverName)));
                                 return Command.SINGLE_SUCCESS;
                             }
 
                             if (!source.hasPermission(CommandHandler.PERMISSION_ROOT + ".off.*") && !source.hasPermission(CommandHandler.PERMISSION_ROOT + ".off." + serverName)) {
-                                source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " &cYou do not have permission to turn off the whitelist on the " + serverName + " server"));
+                                source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("off-no-perm")
+                                        .replace("{server}", serverName)));
                                 return Command.SINGLE_SUCCESS;
                             }
 
@@ -73,9 +76,10 @@ public class OffCommand implements VelocitySubCommand {
                                 config.update();
                                 config.save();
 
-                                source.sendMessage((serializer.deserialize(VelocityWhitelist.PREFIX + " &7You have successfully &cdisabled&7 the whitelist on the " + serverName + " server.")));
+                                source.sendMessage((serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("off-success")
+                                        .replace("{server}", serverName))));
                             } catch (Exception e) {
-                                source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " &cAn error occurred while modifying the configuration."));
+                                source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("modification-error")));
                             }
 
                             return Command.SINGLE_SUCCESS;

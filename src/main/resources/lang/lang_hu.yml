@@ -1,0 +1,32 @@
+# Errors.
+server-not-exists: "&cA/az '{server}' szerver nem létezik."
+modification-error: "&cHiba történt a konfiguráció módosításakor."
+reload-error: "&cHiba történt a konfiguráció újratöltésekor."
+load-error: "&cHiba történt a konfiguráció betöltésekor."
+# Turn on the whitelist.
+on-success: "&7Sikeresen &aengedélyezve&7 a fehérlista a/az {server} szerveren."
+on-no-perm: "&cNincs jogosultságod engedélyezni a fehérlistát a/az {server} szerveren."
+# Turn off the whitelist.
+off-success: "&7Sikeresen &cletiltva&7 a fehérlista a/az {server} szerveren."
+off-no-perm: "&cNincs jogosultságod letiltani a fehérlistát a/az {server} szerveren."
+# Add player to the whitelist.
+add-success: "&7Sikeresen &ahozzáadtad &7{player} játékost a/az {server} szerver fehérlistájához."
+add-no-perm: "&cNincs jogosultságod játékost hozzáadni a/az {server} szerver fehérlistájához."
+# Remove player from the whitelist.
+remove-success: "&7Sikeresen &ctörölted &7{player} játékost a/az {server} szerver fehérlistájáról."
+remove-no-perm: "&cNincs jogosultságod játékost törölni a/az {server} szerver fehérlistájáról."
+# View the server's status.
+status-no-perm: "&cNincs jogosultságod megtekinteni a/az {server} szerver fehérlistájának állapotát."
+status-header: "&7A/az &b{server}&7 szerver fehérlistájának állapota:"
+status-enabled: "&7Engedélyezve: &b"
+status-players: "&7Engedélyezett játékosok:"
+# Reload configuration.
+reload-success: "&7Konfiguráció sikeresen újratöltve!"
+reload-no-perm: "&cNincs jogosultságod a konfigurációt újratölteni."
+# Help
+help-on: "&7/vwl on <szerver> - Fehérlista engedélyezése a megadott szerveren."
+help-off: "&7/vwl off <szerver> - Fehérlista letiltása a megadott szerveren."
+help-add: "&7/vwl add <játékos> <szerver> - Játékos hozzáadása a megadott szerver fehérlistájához."
+help-remove: "&7/vwl remove <játékos> <szerver> - Játékos törlése a megadott szerver fehérlistájáról."
+help-status: "&7/vwl status <szerver> - A megadott szerver fehérlistájának állapota."
+help-reload: "&7/vwl reload - Konfiguráció újratöltése."

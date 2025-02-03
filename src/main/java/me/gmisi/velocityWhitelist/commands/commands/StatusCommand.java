@@ -31,12 +31,13 @@ public class StatusCommand implements VelocitySubCommand {
 
     @Override
     public LiteralCommandNode<CommandSource> getNode() {
+
         return LiteralArgumentBuilder.<CommandSource>literal("status")
                 .executes(context -> {
                     CommandSource source = context.getSource();
 
                     source.sendMessage((serializer.deserialize(VelocityWhitelist.PREFIX)));
-                    source.sendMessage((serializer.deserialize("&7/vwl status <server> - View the status of the specified server whitelist.")));
+                    source.sendMessage((serializer.deserialize(VelocityWhitelist.getLang().getString("help-status"))));
 
                     return Command.SINGLE_SUCCESS;
                 })
@@ -61,12 +62,14 @@ public class StatusCommand implements VelocitySubCommand {
                             String serverName = context.getArgument("server", String.class);
 
                             if (!config.contains("servers." + serverName)) {
-                                source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " &cThe server '" + serverName + "' does not exist."));
+                                source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("server-not-exists")
+                                        .replace("{server}", serverName)));
                                 return Command.SINGLE_SUCCESS;
                             }
 
                             if (!source.hasPermission(CommandHandler.PERMISSION_ROOT + ".status.*") && !source.hasPermission(CommandHandler.PERMISSION_ROOT + ".status." + serverName)) {
-                                source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " &cYou do not have permission to view the status of the " + serverName + " server whitelist."));
+                                source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("status-no-perm")
+                                        .replace("{server}", serverName)));
                                 return Command.SINGLE_SUCCESS;
                             }
 
@@ -74,14 +77,15 @@ public class StatusCommand implements VelocitySubCommand {
                                 boolean enabled = (boolean) config.get("servers."+ serverName  +".enabled");
                                 List<String> whitelisted = config.getStringList("servers." + serverName  + ".whitelisted", new ArrayList<>());
 
-                                source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " &7Whitelist Status for &b" + serverName + "&7: "));
-                                source.sendMessage(serializer.deserialize("&7Enabled: &b" + enabled));
-                                source.sendMessage(serializer.deserialize("&7Players whitelisted:"));
+                                source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("status-header")
+                                        .replace("{server}", serverName)));
+                                source.sendMessage(serializer.deserialize(VelocityWhitelist.getLang().getString("status-enabled") + enabled));
+                                source.sendMessage(serializer.deserialize(VelocityWhitelist.getLang().getString("status-players") + whitelisted));
 
                                 whitelisted.forEach(player -> source.sendMessage(serializer.deserialize("  &7- &b" + player)));
 
                             } catch (Exception e) {
-                                source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " &cAn error occurred while loading the configuration."));
+                                source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("load-error")));
                             }
 
                             return Command.SINGLE_SUCCESS;

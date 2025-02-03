@@ -1,3 +1,5 @@
 file-version: 1
 config: true
+lang: en
 kick-message: "&7You are not whitelisted on the &b{server} &7server."
+proxy-kick-message: "&cYou are not on the whitelist."

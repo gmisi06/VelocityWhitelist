@@ -8,28 +8,33 @@ import dev.dejvokep.boostedyaml.YamlDocument;
 import me.gmisi.velocityWhitelist.VelocityWhitelist;
 import me.gmisi.velocityWhitelist.commands.CommandHandler;
 import me.gmisi.velocityWhitelist.commands.VelocitySubCommand;
+import me.gmisi.velocityWhitelist.utils.LanguageManager;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class ReloadCommand implements VelocitySubCommand {
 
     private final LegacyComponentSerializer serializer = LegacyComponentSerializer.legacyAmpersand();
 
     private final YamlDocument config;
+    private final Path dataDirectory;
 
-    public ReloadCommand(YamlDocument config) {
+    public ReloadCommand(YamlDocument config, Path dataDirectory) {
         this.config = config;
+        this.dataDirectory = dataDirectory;
     }
 
     @Override
     public LiteralCommandNode<CommandSource> getNode() {
+
         return LiteralArgumentBuilder.<CommandSource>literal("reload")
                 .executes(context -> {
                     CommandSource source = context.getSource();
 
                     if (!source.hasPermission(CommandHandler.PERMISSION_ROOT + ".reload")) {
-                        source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " &cYou do not have permission to reload the configuration."));
+                        source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("reload-no-perm")));
                         return Command.SINGLE_SUCCESS;
                     }
 
@@ -38,9 +43,24 @@ public class ReloadCommand implements VelocitySubCommand {
                         config.update();
                         config.save();
 
-                        source.sendMessage((serializer.deserialize(VelocityWhitelist.PREFIX + " &7Configuration successfully reloaded!")));
+                        VelocityWhitelist.getLang().reload();
+                        VelocityWhitelist.getLang().update();
+                        VelocityWhitelist.getLang().save();
+
+                        LanguageManager languageManager = new LanguageManager(dataDirectory);
+                        if (!config.contains("lang")) {
+                            languageManager.loadLanguageFile();
+                        }
+                        else {
+                            String language = config.getString("lang");
+                            languageManager.loadLanguageFile(language);
+                        }
+
+                        VelocityWhitelist.setLang(languageManager.getLanguageConfig());
+
+                        source.sendMessage((serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("reload-success"))));
                     } catch (IOException e) {
-                        source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " &cAn error occurred while reloading the configuration."));
+                        source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("reload-error")));
                     }
 
                     return Command.SINGLE_SUCCESS;
