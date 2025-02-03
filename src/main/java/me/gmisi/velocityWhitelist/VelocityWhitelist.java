@@ -12,7 +12,7 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import lombok.Getter;
 import me.gmisi.velocityWhitelist.commands.CommandHandler;
-import me.gmisi.velocityWhitelist.listeners.PreLoginListener;
+import me.gmisi.velocityWhitelist.listeners.LoginListener;
 import me.gmisi.velocityWhitelist.listeners.ServerPreConnectionListener;
 import me.gmisi.velocityWhitelist.utils.ConfigManager;
 import me.gmisi.velocityWhitelist.utils.LanguageManager;
@@ -75,7 +75,7 @@ public class VelocityWhitelist {
         commandManager.register(commandMeta, reloadCommandToRegister);
 
         proxy.getEventManager().register(this, new ServerPreConnectionListener(config, logger));
-        proxy.getEventManager().register(this, new PreLoginListener(config));
+        proxy.getEventManager().register(this, new LoginListener(config));
 
         logger.info("VelocityWhitelist plugin has initialized!");
     }

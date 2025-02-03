@@ -34,7 +34,7 @@ public class ServerPreConnectionListener {
             List<String> whitelisted = config.getStringList("servers." + serverName  + ".whitelisted", new ArrayList<>());
             Player player = event.getPlayer();
 
-            if (!whitelisted.contains(player.getUsername()) && player.hasPermission(CommandHandler.PERMISSION_ROOT + ".bypass")) {
+            if (!whitelisted.contains(player.getUsername()) && !(player.hasPermission(CommandHandler.PERMISSION_ROOT + ".bypass"))) {
                 event.setResult(ServerPreConnectEvent.ServerResult.denied());
                 String message = config.getString("kick-message")
                         .replace("{server}", serverName
