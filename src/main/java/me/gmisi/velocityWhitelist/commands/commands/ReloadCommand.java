@@ -6,6 +6,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.velocitypowered.api.command.CommandSource;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import me.gmisi.velocityWhitelist.VelocityWhitelist;
+import me.gmisi.velocityWhitelist.commands.CommandHandler;
 import me.gmisi.velocityWhitelist.commands.VelocitySubCommand;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
@@ -27,7 +28,7 @@ public class ReloadCommand implements VelocitySubCommand {
                 .executes(context -> {
                     CommandSource source = context.getSource();
 
-                    if (!source.hasPermission("velocity.reload")) {
+                    if (!source.hasPermission(CommandHandler.PERMISSION_ROOT + ".reload")) {
                         source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " &cYou do not have permission to reload the configuration."));
                         return Command.SINGLE_SUCCESS;
                     }

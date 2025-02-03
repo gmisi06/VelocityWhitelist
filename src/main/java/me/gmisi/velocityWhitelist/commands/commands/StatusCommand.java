@@ -8,6 +8,7 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ProxyServer;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import me.gmisi.velocityWhitelist.VelocityWhitelist;
+import me.gmisi.velocityWhitelist.commands.CommandHandler;
 import me.gmisi.velocityWhitelist.commands.VelocitySubCommand;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
@@ -64,7 +65,7 @@ public class StatusCommand implements VelocitySubCommand {
                                 return Command.SINGLE_SUCCESS;
                             }
 
-                            if (!source.hasPermission("velocity.status.*") && !source.hasPermission("velocity.status." + serverName)) {
+                            if (!source.hasPermission(CommandHandler.PERMISSION_ROOT + ".status.*") && !source.hasPermission(CommandHandler.PERMISSION_ROOT + ".status." + serverName)) {
                                 source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " &cYou do not have permission to view the status of the " + serverName + " server whitelist."));
                                 return Command.SINGLE_SUCCESS;
                             }

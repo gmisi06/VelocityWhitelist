@@ -8,6 +8,7 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ProxyServer;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import me.gmisi.velocityWhitelist.VelocityWhitelist;
+import me.gmisi.velocityWhitelist.commands.CommandHandler;
 import me.gmisi.velocityWhitelist.commands.VelocitySubCommand;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
@@ -61,7 +62,7 @@ public class OffCommand implements VelocitySubCommand {
                                 return Command.SINGLE_SUCCESS;
                             }
 
-                            if (!source.hasPermission("velocity.off.*") && !source.hasPermission("velocity.off." + serverName)) {
+                            if (!source.hasPermission(CommandHandler.PERMISSION_ROOT + ".off.*") && !source.hasPermission(CommandHandler.PERMISSION_ROOT + ".off." + serverName)) {
                                 source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " &cYou do not have permission to turn off the whitelist on the " + serverName + " server"));
                                 return Command.SINGLE_SUCCESS;
                             }

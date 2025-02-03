@@ -15,11 +15,14 @@ public class CommandHandler {
 
     private final static LegacyComponentSerializer serializer = LegacyComponentSerializer.legacyAmpersand();
     private final static YamlDocument config = VelocityWhitelist.getConfig();
+    public static String PERMISSION_ROOT = "velocitywhitelist";
 
     public static BrigadierCommand createBrigadierCommand(final ProxyServer proxy, final String command) {
 
+
+
         LiteralCommandNode<CommandSource> chatNode = BrigadierCommand.literalArgumentBuilder(command)
-                .requires(source -> source.hasPermission("velocitywhitelist"))
+                .requires(source -> source.hasPermission(PERMISSION_ROOT))
                 .executes(context -> {
                     CommandSource source = context.getSource();
 

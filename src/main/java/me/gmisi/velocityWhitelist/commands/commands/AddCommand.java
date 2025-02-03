@@ -9,6 +9,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import me.gmisi.velocityWhitelist.VelocityWhitelist;
+import me.gmisi.velocityWhitelist.commands.CommandHandler;
 import me.gmisi.velocityWhitelist.commands.VelocitySubCommand;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
@@ -76,7 +77,7 @@ public class AddCommand implements VelocitySubCommand {
                                         return Command.SINGLE_SUCCESS;
                                     }
 
-                                    if (!source.hasPermission("velocity.add.*") && !source.hasPermission("velocity.add." + serverName)) {
+                                    if (!source.hasPermission(CommandHandler.PERMISSION_ROOT + ".add.*") && !source.hasPermission(CommandHandler.PERMISSION_ROOT + ".add." + serverName)) {
                                         source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " &cYou do not have permission to add players to the " + serverName + " whitelist."));
                                         return Command.SINGLE_SUCCESS;
                                     }
