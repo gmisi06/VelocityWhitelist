@@ -26,7 +26,7 @@ import java.nio.file.Path;
 @Plugin(
         id = "VelocityWhitelist",
         name = "VelocityWhitelist",
-        version = "1.0.1-SNAPSHOT",
+        version = "1.0.2-SNAPSHOT",
         description = "A Velocity Proxy server whitelist plugin.",
         authors = {"gmisi"}
 )

@@ -80,7 +80,7 @@ public class StatusCommand implements VelocitySubCommand {
                                 source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("status-header")
                                         .replace("{server}", serverName)));
                                 source.sendMessage(serializer.deserialize(VelocityWhitelist.getLang().getString("status-enabled") + enabled));
-                                source.sendMessage(serializer.deserialize(VelocityWhitelist.getLang().getString("status-players") + whitelisted));
+                                source.sendMessage(serializer.deserialize(VelocityWhitelist.getLang().getString("status-players")));
 
                                 whitelisted.forEach(player -> source.sendMessage(serializer.deserialize("  &7- &b" + player)));
 
