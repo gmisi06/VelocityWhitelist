@@ -10,8 +10,6 @@ import me.gmisi.velocityWhitelist.VelocityWhitelist;
 import me.gmisi.velocityWhitelist.commands.commands.*;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
-import java.nio.file.Path;
-
 
 public class CommandHandler {
 
@@ -19,7 +17,7 @@ public class CommandHandler {
     private final static YamlDocument config = VelocityWhitelist.getConfig();
     public static String PERMISSION_ROOT = "velocitywhitelist";
 
-    public static BrigadierCommand createBrigadierCommand(final ProxyServer proxy, final String command, final Path dataDirectory) {
+    public static BrigadierCommand createBrigadierCommand(final ProxyServer proxy, final String command) {
 
         LiteralCommandNode<CommandSource> chatNode = BrigadierCommand.literalArgumentBuilder(command)
                 .requires(source -> source.hasPermission(PERMISSION_ROOT))
@@ -32,6 +30,7 @@ public class CommandHandler {
                     source.sendMessage((serializer.deserialize(VelocityWhitelist.getLang().getString("help-add"))));
                     source.sendMessage((serializer.deserialize(VelocityWhitelist.getLang().getString("help-remove"))));
                     source.sendMessage((serializer.deserialize(VelocityWhitelist.getLang().getString("help-status"))));
+                    source.sendMessage((serializer.deserialize(VelocityWhitelist.getLang().getString("help-kick"))));
                     source.sendMessage((serializer.deserialize(VelocityWhitelist.getLang().getString("help-reload"))));
 
                     return Command.SINGLE_SUCCESS;
@@ -41,7 +40,8 @@ public class CommandHandler {
                 .then(new AddCommand(proxy, config).getNode())
                 .then(new RemoveCommand(proxy, config).getNode())
                 .then(new StatusCommand(proxy, config).getNode())
-                .then(new ReloadCommand(config, dataDirectory).getNode())
+                .then(new ReloadCommand(config).getNode())
+                .then(new KickCommand(proxy, config).getNode())
                 .build();
 
         return new BrigadierCommand(chatNode);

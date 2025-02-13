@@ -23,10 +23,14 @@ status-players: "&7Engedélyezett játékosok:"
 # Reload configuration.
 reload-success: "&7Konfiguráció sikeresen újratöltve!"
 reload-no-perm: "&cNincs jogosultságod a konfigurációt újratölteni."
+# Kick
+kick-success: "&7Sikeresen &ckirúgtad &7a nem fehérlistás játékosokat a/az {server} szerverről."
+kick-no-perm: "&cNincs jogosultságod kirúgni a játékosokat."
 # Help
 help-on: "&7/vwl on <szerver> - Fehérlista engedélyezése a megadott szerveren."
 help-off: "&7/vwl off <szerver> - Fehérlista letiltása a megadott szerveren."
 help-add: "&7/vwl add <játékos> <szerver> - Játékos hozzáadása a megadott szerver fehérlistájához."
 help-remove: "&7/vwl remove <játékos> <szerver> - Játékos törlése a megadott szerver fehérlistájáról."
 help-status: "&7/vwl status <szerver> - A megadott szerver fehérlistájának állapota."
+help-kick: "&7/vwl kick <server> - A fehérlistán nem szereplő játékosok kirúgása a megadott szerverről."
 help-reload: "&7/vwl reload - Konfiguráció újratöltése."

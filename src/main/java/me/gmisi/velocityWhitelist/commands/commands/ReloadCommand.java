@@ -12,18 +12,15 @@ import me.gmisi.velocityWhitelist.utils.LanguageManager;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 public class ReloadCommand implements VelocitySubCommand {
 
     private final LegacyComponentSerializer serializer = LegacyComponentSerializer.legacyAmpersand();
 
     private final YamlDocument config;
-    private final Path dataDirectory;
 
-    public ReloadCommand(YamlDocument config, Path dataDirectory) {
+    public ReloadCommand(YamlDocument config) {
         this.config = config;
-        this.dataDirectory = dataDirectory;
     }
 
     @Override
@@ -47,7 +44,7 @@ public class ReloadCommand implements VelocitySubCommand {
                         VelocityWhitelist.getLang().update();
                         VelocityWhitelist.getLang().save();
 
-                        LanguageManager languageManager = new LanguageManager(dataDirectory);
+                        LanguageManager languageManager = new LanguageManager();
                         if (!config.contains("lang")) {
                             languageManager.loadLanguageFile();
                         }

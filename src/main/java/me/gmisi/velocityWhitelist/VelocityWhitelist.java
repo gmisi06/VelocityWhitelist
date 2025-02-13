@@ -11,7 +11,6 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import lombok.Getter;
-import lombok.Setter;
 import me.gmisi.velocityWhitelist.commands.CommandHandler;
 import me.gmisi.velocityWhitelist.listeners.LoginListener;
 import me.gmisi.velocityWhitelist.listeners.ServerPreConnectionListener;
@@ -26,41 +25,34 @@ import java.nio.file.Path;
 @Plugin(
         id = "VelocityWhitelist",
         name = "VelocityWhitelist",
-        version = "1.0.2-SNAPSHOT",
+        version = "1.0.3-SNAPSHOT",
         description = "A Velocity Proxy server whitelist plugin.",
         authors = {"gmisi"}
 )
 public class VelocityWhitelist {
 
-    public final static String PREFIX = "&9&l[VelocityWhitelist]";
-
     private final ProxyServer proxy;
-
-    @Getter
     private final Logger logger;
+
+    public final static String PREFIX = "&9&l[VelocityWhitelist]";
 
     @Getter
     private static YamlDocument config;
 
-    @Setter
     @Getter
     private static YamlDocument lang;
-
-    @Getter
-    private final Path dataDirectory;
 
     @Inject
     public VelocityWhitelist(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         this.proxy = server;
         this.logger = logger;
-        this.dataDirectory = dataDirectory;
 
         ConfigManager configManager = new ConfigManager(dataDirectory, logger, server);
 
         config = configManager.getConfig();
 
         try {
-            LanguageManager languageManager = new LanguageManager(dataDirectory);
+            LanguageManager languageManager = new LanguageManager();
             if (!config.contains("lang")) {
                 languageManager.loadLanguageFile();
             }
@@ -86,7 +78,7 @@ public class VelocityWhitelist {
                 .plugin(this)
                 .build();
 
-        BrigadierCommand reloadCommandToRegister = CommandHandler.createBrigadierCommand(proxy, "velocitywhitelist", dataDirectory);
+        BrigadierCommand reloadCommandToRegister = CommandHandler.createBrigadierCommand(proxy, "velocitywhitelist");
         commandManager.register(commandMeta, reloadCommandToRegister);
 
         proxy.getEventManager().register(this, new ServerPreConnectionListener(config, logger));

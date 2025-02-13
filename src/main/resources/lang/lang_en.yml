@@ -23,10 +23,14 @@ status-players: "&7Players whitelisted:"
 # Reload configuration.
 reload-success: "&7Configuration successfully reloaded!"
 reload-no-perm: "&cYou do not have permission to reload the configuration."
+# Kick
+kick-success: "&7You have successfully &ckicked non-whitelisted players from the {server} server."
+kick-no-perm: "&cYou do not have permission to kick the players."
 # Help
 help-on: "&7/vwl on <server> - Turn on the whitelist on the specified server."
 help-off: "&7/vwl off <server> - Turn off the whitelist on the specified server."
 help-add: "&7/vwl add <player> <server> - Add player to the specified server's whitelist."
 help-remove: "&7/vwl remove <player> <server> - Remove player from the specified server's whitelist."
 help-status: "&7/vwl status <server> - View the status of the specified server whitelist."
+help-kick: "&7/vwl kick <server> - Kicking players not on the whitelist from the specified server."
 help-reload: "&7/vwl reload - Reload configuration."

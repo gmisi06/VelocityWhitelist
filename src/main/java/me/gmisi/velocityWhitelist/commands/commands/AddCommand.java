@@ -38,7 +38,7 @@ public class AddCommand implements VelocitySubCommand {
                     CommandSource source = context.getSource();
 
                     source.sendMessage((serializer.deserialize(VelocityWhitelist.PREFIX)));
-                    source.sendMessage((serializer.deserialize(VelocityWhitelist.getLang().getString("add-success"))));
+                    source.sendMessage((serializer.deserialize(VelocityWhitelist.getLang().getString("help-add"))));
 
                     return Command.SINGLE_SUCCESS;
                 })
