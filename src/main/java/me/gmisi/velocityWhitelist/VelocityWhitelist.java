@@ -11,6 +11,7 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import lombok.Getter;
+import lombok.Setter;
 import me.gmisi.velocityWhitelist.commands.CommandHandler;
 import me.gmisi.velocityWhitelist.listeners.LoginListener;
 import me.gmisi.velocityWhitelist.listeners.ServerPreConnectionListener;
@@ -39,6 +40,7 @@ public class VelocityWhitelist {
     @Getter
     private static YamlDocument config;
 
+    @Setter
     @Getter
     private static YamlDocument lang;
 
