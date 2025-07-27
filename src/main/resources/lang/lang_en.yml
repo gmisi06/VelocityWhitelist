@@ -1,3 +1,4 @@
+file-version: 2
 # Errors.
 server-not-exists: "&cThe server '{server}' does not exist."
 modification-error: "&cAn error occurred while modifying the configuration."
@@ -20,6 +21,8 @@ status-no-perm: "&cYou do not have permission to view the status of the {server}
 status-header: "&7Whitelist Status for &b{server}&7:"
 status-enabled: "&7Enabled: &b"
 status-players: "&7Players whitelisted:"
+status-yes: "&byes"
+status-no: "&bno"
 # Reload configuration.
 reload-success: "&7Configuration successfully reloaded!"
 reload-no-perm: "&cYou do not have permission to reload the configuration."

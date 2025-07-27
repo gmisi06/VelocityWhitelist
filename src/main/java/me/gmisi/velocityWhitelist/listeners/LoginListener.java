@@ -4,31 +4,29 @@ import com.velocitypowered.api.event.ResultedEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.proxy.Player;
-import dev.dejvokep.boostedyaml.YamlDocument;
-import me.gmisi.velocityWhitelist.VelocityWhitelist;
-import me.gmisi.velocityWhitelist.commands.CommandHandler;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import me.gmisi.velocityWhitelist.utils.ConfigManager;
+import me.gmisi.velocityWhitelist.utils.MessageUtil;
+import me.gmisi.velocityWhitelist.utils.PermissionUtil;
+import me.gmisi.velocityWhitelist.utils.WhitelistManager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class LoginListener {
-    private final LegacyComponentSerializer serializer = LegacyComponentSerializer.legacyAmpersand();
 
-    private final YamlDocument config;
+    private final ConfigManager configManager;
 
-    public LoginListener(YamlDocument config) {
-        this.config = config;
+    public LoginListener(ConfigManager configManager) {
+        this.configManager = configManager;
     }
 
     @Subscribe
     public void onLoginEvent(LoginEvent event) {
-        if ((boolean) config.get("servers.VelocityProxy.enabled")) {
-            List<?> whitelisted = config.getStringList("servers.VelocityProxy.whitelisted", new ArrayList<>());
+        if (configManager.getWhitelistManager().isWhitelistEnabled("VelocityProxy")) {
+            List<String> whitelisted = configManager.getWhitelistManager().getWhitelistedPlayers("VelocityProxy");
             Player player = event.getPlayer();
 
-            if (!whitelisted.contains(player.getUsername()) && !(player.hasPermission(CommandHandler.PERMISSION_ROOT + ".bypass"))) {
-                event.setResult(ResultedEvent.ComponentResult.denied(serializer.deserialize( VelocityWhitelist.PREFIX + " " + config.getString("proxy-kick-message"))));
+            if (!whitelisted.contains(player.getUsername()) && !(PermissionUtil.hasGlobal(player, "bypass"))) {
+                event.setResult(ResultedEvent.ComponentResult.denied(MessageUtil.getPrefixed(configManager.get("proxy-kick-message", "You are not on the whitelist."))));
             }
         }
     }

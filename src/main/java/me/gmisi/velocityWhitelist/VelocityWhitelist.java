@@ -7,68 +7,50 @@ import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.plugin.Plugin;
+import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
-import dev.dejvokep.boostedyaml.YamlDocument;
 import lombok.Getter;
-import lombok.Setter;
 import me.gmisi.velocityWhitelist.commands.CommandHandler;
 import me.gmisi.velocityWhitelist.listeners.LoginListener;
 import me.gmisi.velocityWhitelist.listeners.ServerPreConnectionListener;
 import me.gmisi.velocityWhitelist.utils.ConfigManager;
-import me.gmisi.velocityWhitelist.utils.LanguageManager;
 import me.gmisi.velocityWhitelist.utils.ServersLoader;
 import org.slf4j.Logger;
 
-import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Optional;
 
 @Plugin(
         id = "VelocityWhitelist",
         name = "VelocityWhitelist",
-        version = "1.0.3-SNAPSHOT",
+        version = "1.1.0-SNAPSHOT",
         description = "A Velocity Proxy server whitelist plugin.",
         authors = {"gmisi"}
 )
 public class VelocityWhitelist {
 
+    @Getter
     private final ProxyServer proxy;
+
+    @Getter
     private final Logger logger;
 
-    public final static String PREFIX = "&9&l[VelocityWhitelist]";
+    private final ConfigManager configManager;
 
     @Getter
-    private static YamlDocument config;
-
-    @Setter
-    @Getter
-    private static YamlDocument lang;
+    private final Path dataDirectory;
 
     @Inject
     public VelocityWhitelist(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         this.proxy = server;
         this.logger = logger;
+        this.dataDirectory = dataDirectory;
 
-        ConfigManager configManager = new ConfigManager(dataDirectory, logger, server);
+        ConfigManager.init(dataDirectory, logger, server);
+        configManager = ConfigManager.getInstance();
 
-        config = configManager.getConfig();
-
-        try {
-            LanguageManager languageManager = new LanguageManager();
-            if (!config.contains("lang")) {
-                languageManager.loadLanguageFile();
-            }
-            else {
-                String language = config.getString("lang");
-                languageManager.loadLanguageFile(language);
-            }
-
-            lang = languageManager.getLanguageConfig();
-        } catch (IOException e) {
-            logger.error("Failed to load language file!", e);
-        }
-
-        ServersLoader.loadServers(proxy, logger);
+        ServersLoader.loadServers(proxy, configManager, logger);
     }
 
     @Subscribe
@@ -80,12 +62,22 @@ public class VelocityWhitelist {
                 .plugin(this)
                 .build();
 
-        BrigadierCommand reloadCommandToRegister = CommandHandler.createBrigadierCommand(proxy, "velocitywhitelist");
+        BrigadierCommand reloadCommandToRegister = CommandHandler.createBrigadierCommand(proxy, "velocitywhitelist", configManager);
         commandManager.register(commandMeta, reloadCommandToRegister);
 
-        proxy.getEventManager().register(this, new ServerPreConnectionListener(config, logger));
-        proxy.getEventManager().register(this, new LoginListener(config));
+        proxy.getEventManager().register(this, new ServerPreConnectionListener(configManager));
+        proxy.getEventManager().register(this, new LoginListener(configManager));
 
         logger.info("VelocityWhitelist plugin has initialized!");
+    }
+
+    public void shutdown(String reason) {
+        logger.error(reason);
+        this.shutdown();
+    }
+
+    public void shutdown() {
+        Optional<PluginContainer> container = proxy.getPluginManager().getPlugin("VelocityWhitelist");
+        container.ifPresent(plugin -> plugin.getExecutorService().shutdown());
     }
 }

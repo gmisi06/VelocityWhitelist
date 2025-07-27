@@ -1,3 +1,4 @@
+file-version: 2
 # Errors.
 server-not-exists: "&cA/az '{server}' szerver nem létezik."
 modification-error: "&cHiba történt a konfiguráció módosításakor."
@@ -20,6 +21,8 @@ status-no-perm: "&cNincs jogosultságod megtekinteni a/az {server} szerver fehé
 status-header: "&7A/az &b{server}&7 szerver fehérlistájának állapota:"
 status-enabled: "&7Engedélyezve: &b"
 status-players: "&7Engedélyezett játékosok:"
+status-yes: "&bigen"
+status-no: "&bnem"
 # Reload configuration.
 reload-success: "&7Konfiguráció sikeresen újratöltve!"
 reload-no-perm: "&cNincs jogosultságod a konfigurációt újratölteni."

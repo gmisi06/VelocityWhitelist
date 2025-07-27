@@ -2,66 +2,61 @@ package me.gmisi.velocityWhitelist.commands.commands;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.velocitypowered.api.command.CommandSource;
-import dev.dejvokep.boostedyaml.YamlDocument;
-import me.gmisi.velocityWhitelist.VelocityWhitelist;
-import me.gmisi.velocityWhitelist.commands.CommandHandler;
 import me.gmisi.velocityWhitelist.commands.VelocitySubCommand;
-import me.gmisi.velocityWhitelist.utils.LanguageManager;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-
-import java.io.IOException;
+import me.gmisi.velocityWhitelist.lang.LangKey;
+import me.gmisi.velocityWhitelist.utils.ConfigManager;
+import me.gmisi.velocityWhitelist.utils.MessageUtil;
+import me.gmisi.velocityWhitelist.utils.PermissionUtil;
 
 public class ReloadCommand implements VelocitySubCommand {
 
-    private final LegacyComponentSerializer serializer = LegacyComponentSerializer.legacyAmpersand();
 
-    private final YamlDocument config;
+    private final ConfigManager configManager;
 
-    public ReloadCommand(YamlDocument config) {
-        this.config = config;
+    public ReloadCommand(ConfigManager configManager) {
+        this.configManager = configManager;
     }
 
     @Override
     public LiteralCommandNode<CommandSource> getNode() {
-
         return LiteralArgumentBuilder.<CommandSource>literal("reload")
-                .executes(context -> {
-                    CommandSource source = context.getSource();
-
-                    if (!source.hasPermission(CommandHandler.PERMISSION_ROOT + ".reload")) {
-                        source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("reload-no-perm")));
-                        return Command.SINGLE_SUCCESS;
-                    }
-
-                    try {
-                        config.reload();
-                        config.update();
-                        config.save();
-
-                        VelocityWhitelist.getLang().reload();
-                        VelocityWhitelist.getLang().update();
-                        VelocityWhitelist.getLang().save();
-
-                        LanguageManager languageManager = new LanguageManager();
-                        if (!config.contains("lang")) {
-                            languageManager.loadLanguageFile();
-                        }
-                        else {
-                            String language = config.getString("lang");
-                            languageManager.loadLanguageFile(language);
-                        }
-
-                        VelocityWhitelist.setLang(languageManager.getLanguageConfig());
-
-                        source.sendMessage((serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("reload-success"))));
-                    } catch (IOException e) {
-                        source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("reload-error")));
-                    }
-
-                    return Command.SINGLE_SUCCESS;
-                })
+                .executes(this::executeReload)
                 .build();
+    }
+
+    /**
+     * Executes the {@code /vwl reload} command.
+     * <p>
+     * This command reloads the plugin's configuration and language files.
+     * It performs the following steps:
+     * <ul>
+     *     <li>Checks if the command source has the global {@code reload} permission.</li>
+     *     <li>Reloads the main configuration file using {@link ConfigManager}.</li>
+     *     <li>Reads the language code from the newly loaded configuration.</li>
+     *     <li>Loads the corresponding language file and updates the global language reference.</li>
+     *     <li>Sends a localized success message to the command source.</li>
+     * </ul>
+     * <p>
+     * If the command source lacks permission, an appropriate error message is shown.
+     *
+     * @param context the {@link CommandContext} containing the command source and arguments
+     * @return {@code Command.SINGLE_SUCCESS} indicating the command was processed
+     */
+    private int executeReload(CommandContext<CommandSource> context) {
+        CommandSource source = context.getSource();
+
+        if (!PermissionUtil.hasGlobal(source, "reload")) {
+            MessageUtil.sendPrefixed(source, configManager.getLang().get(LangKey.RELOAD_NO_PERM));
+            return Command.SINGLE_SUCCESS;
+        }
+
+        configManager.reload(source);
+
+        MessageUtil.sendPrefixed(source, configManager.getLang().get(LangKey.RELOAD_SUCCESS));
+
+        return Command.SINGLE_SUCCESS;
     }
 }

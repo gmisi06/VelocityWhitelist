@@ -3,94 +3,118 @@ package me.gmisi.velocityWhitelist.commands.commands;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ProxyServer;
 import dev.dejvokep.boostedyaml.YamlDocument;
-import me.gmisi.velocityWhitelist.VelocityWhitelist;
-import me.gmisi.velocityWhitelist.commands.CommandHandler;
+import me.gmisi.velocityWhitelist.commands.SuggestUtil;
 import me.gmisi.velocityWhitelist.commands.VelocitySubCommand;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import me.gmisi.velocityWhitelist.lang.LangKey;
+import me.gmisi.velocityWhitelist.utils.WhitelistManager;
+import me.gmisi.velocityWhitelist.utils.ConfigManager;
+import me.gmisi.velocityWhitelist.utils.MessageUtil;
+import me.gmisi.velocityWhitelist.utils.PermissionUtil;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.word;
 
 public class StatusCommand implements VelocitySubCommand {
 
-    private final LegacyComponentSerializer serializer = LegacyComponentSerializer.legacyAmpersand();
-
     private final ProxyServer proxy;
     private final YamlDocument config;
+    private final ConfigManager configManager;
 
-    public StatusCommand(ProxyServer proxy, YamlDocument config) {
+    public StatusCommand(ProxyServer proxy, ConfigManager configManager) {
         this.proxy = proxy;
-        this.config = config;
+        this.config = configManager.getConfig();
+        this.configManager = configManager;
     }
 
     @Override
     public LiteralCommandNode<CommandSource> getNode() {
 
         return LiteralArgumentBuilder.<CommandSource>literal("status")
-                .executes(context -> {
-                    CommandSource source = context.getSource();
-
-                    source.sendMessage((serializer.deserialize(VelocityWhitelist.PREFIX)));
-                    source.sendMessage((serializer.deserialize(VelocityWhitelist.getLang().getString("help-status"))));
-
-                    return Command.SINGLE_SUCCESS;
-                })
-                .then(RequiredArgumentBuilder.<CommandSource, String>argument("server", word())
-                        .suggests((context, builder) -> {
-
-                            if ("velocityproxy".startsWith(builder.getRemaining().toLowerCase())) {
-                                builder.suggest("VelocityProxy");
-                            }
-
-                            proxy.getAllServers().stream()
-                                    .map(server -> server.getServerInfo().getName())
-                                    .filter(name -> name.toLowerCase().startsWith(builder.getRemaining().toLowerCase()))
-                                    .limit(10)
-                                    .forEach(builder::suggest);
-
-                            return builder.buildFuture();
-                        })
-                        .executes(context -> {
-                            CommandSource source = context.getSource();
-
-                            String serverName = context.getArgument("server", String.class);
-
-                            if (!config.contains("servers." + serverName)) {
-                                source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("server-not-exists")
-                                        .replace("{server}", serverName)));
-                                return Command.SINGLE_SUCCESS;
-                            }
-
-                            if (!source.hasPermission(CommandHandler.PERMISSION_ROOT + ".status.*") && !source.hasPermission(CommandHandler.PERMISSION_ROOT + ".status." + serverName)) {
-                                source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("status-no-perm")
-                                        .replace("{server}", serverName)));
-                                return Command.SINGLE_SUCCESS;
-                            }
-
-                            try {
-                                boolean enabled = (boolean) config.get("servers."+ serverName  +".enabled");
-                                List<String> whitelisted = config.getStringList("servers." + serverName  + ".whitelisted", new ArrayList<>());
-
-                                source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("status-header")
-                                        .replace("{server}", serverName)));
-                                source.sendMessage(serializer.deserialize(VelocityWhitelist.getLang().getString("status-enabled") + enabled));
-                                source.sendMessage(serializer.deserialize(VelocityWhitelist.getLang().getString("status-players")));
-
-                                whitelisted.forEach(player -> source.sendMessage(serializer.deserialize("  &7- &b" + player)));
-
-                            } catch (Exception e) {
-                                source.sendMessage(serializer.deserialize(VelocityWhitelist.PREFIX + " " + VelocityWhitelist.getLang().getString("load-error")));
-                            }
-
-                            return Command.SINGLE_SUCCESS;
-                        }))
+                .executes(this::sendHelp)
+                .then(buildServerArg())
                 .build();
+    }
+
+    /**
+     * Sends the help message for the <code>/vwl status</code> command to the command source.
+     * This includes the plugin prefix and the localized help text from the language file.
+     *
+     * @param context the command execution context
+     * @return {@code Command.SINGLE_SUCCESS} to indicate successful execution
+     */
+    private int sendHelp(CommandContext<CommandSource> context) {
+        CommandSource source = context.getSource();
+        MessageUtil.sendPrefix(source);
+        MessageUtil.sendNotPrefixed(source, configManager.getLang().get(LangKey.HELP_STATUS));
+        return Command.SINGLE_SUCCESS;
+    }
+
+    /**
+     * Builds the {@code server} argument node and attaches suggestion and execution logic.
+     */
+    private RequiredArgumentBuilder<CommandSource, String> buildServerArg() {
+        return RequiredArgumentBuilder.<CommandSource, String>argument("server", word())
+                .suggests((context, builder) -> SuggestUtil.serverSuggests(proxy, builder))
+                .executes(this::executeStatus);
+    }
+
+    /**
+     * Executes the {@code /vwl remove <player> <server>} command.
+     * <p>
+     * This command removes a specified player from the whitelist of the given server.
+     * Before removing, it checks whether the target server exists and if the command source
+     * has the appropriate permission to perform the removal.
+     * <p>
+     * If the server is not found, or the source lacks permission, the method sends an appropriate
+     * localized error message to the source and terminates.
+     * <p>
+     * Upon successful removal, the configuration is updated and saved,
+     * and a success message is sent. If an error occurs during the modification process,
+     * a generic failure message is displayed instead.
+     *
+     * @param context the command context containing the parsed arguments, including {@code player} and {@code server}
+     * @return {@code Command.SINGLE_SUCCESS} indicating that the command has completed processing
+     */
+    private int executeStatus(CommandContext<CommandSource> context) {
+        CommandSource source = context.getSource();
+        String serverName = context.getArgument("server", String.class);
+
+        Map<String, String> placeholders = Map.of(
+                "server", serverName
+        );
+
+        if (!config.contains("servers." + serverName)) {
+            MessageUtil.sendPrefixed(source, configManager.getLang().getFormatted(LangKey.SERVER_NOT_EXISTS, placeholders));
+            return Command.SINGLE_SUCCESS;
+        }
+
+        if (!PermissionUtil.hasServerPermission(source, "status", serverName)) {
+            MessageUtil.sendPrefixed(source, configManager.getLang().get(LangKey.STATUS_NO_PERM));
+            return Command.SINGLE_SUCCESS;
+        }
+
+        try {
+            boolean enabled = configManager.getWhitelistManager().isWhitelistEnabled(serverName);
+            List<String> whitelisted = configManager.getWhitelistManager().getWhitelistedPlayers(serverName);
+
+            MessageUtil.sendPrefixed(source, configManager.getLang().getFormatted(LangKey.STATUS_HEADER, placeholders));
+            MessageUtil.sendNotPrefixed(source, configManager.getLang().get(LangKey.STATUS_ENABLED) + (enabled ? configManager.getLang().get(LangKey.STATUS_YES): configManager.getLang().get(LangKey.STATUS_NO) ));
+            MessageUtil.sendNotPrefixed(source, configManager.getLang().get(LangKey.STATUS_PLAYERS));
+
+            whitelisted.forEach(player -> MessageUtil.sendNotPrefixed(source, "  &7- &b" + player));
+
+        } catch (Exception e) {
+            MessageUtil.sendPrefixed(source, configManager.getLang().get(LangKey.LOAD_ERROR));
+        }
+
+        return Command.SINGLE_SUCCESS;
     }
 
 }

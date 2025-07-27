@@ -5,43 +5,49 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ProxyServer;
-import dev.dejvokep.boostedyaml.YamlDocument;
-import me.gmisi.velocityWhitelist.VelocityWhitelist;
 import me.gmisi.velocityWhitelist.commands.commands.*;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import me.gmisi.velocityWhitelist.lang.LangKey;
+import me.gmisi.velocityWhitelist.utils.ConfigManager;
+import me.gmisi.velocityWhitelist.utils.MessageUtil;
+
+import java.util.List;
 
 
 public class CommandHandler {
 
-    private final static LegacyComponentSerializer serializer = LegacyComponentSerializer.legacyAmpersand();
-    private final static YamlDocument config = VelocityWhitelist.getConfig();
-    public static String PERMISSION_ROOT = "velocitywhitelist";
+    public final static String PERMISSION_ROOT = "velocitywhitelist";
 
-    public static BrigadierCommand createBrigadierCommand(final ProxyServer proxy, final String command) {
+    public static BrigadierCommand createBrigadierCommand(final ProxyServer proxy, final String command, ConfigManager configManager) {
 
         LiteralCommandNode<CommandSource> chatNode = BrigadierCommand.literalArgumentBuilder(command)
                 .requires(source -> source.hasPermission(PERMISSION_ROOT))
                 .executes(context -> {
                     CommandSource source = context.getSource();
 
-                    source.sendMessage((serializer.deserialize(VelocityWhitelist.PREFIX)));
-                    source.sendMessage((serializer.deserialize(VelocityWhitelist.getLang().getString("help-on"))));
-                    source.sendMessage((serializer.deserialize(VelocityWhitelist.getLang().getString("help-off"))));
-                    source.sendMessage((serializer.deserialize(VelocityWhitelist.getLang().getString("help-add"))));
-                    source.sendMessage((serializer.deserialize(VelocityWhitelist.getLang().getString("help-remove"))));
-                    source.sendMessage((serializer.deserialize(VelocityWhitelist.getLang().getString("help-status"))));
-                    source.sendMessage((serializer.deserialize(VelocityWhitelist.getLang().getString("help-kick"))));
-                    source.sendMessage((serializer.deserialize(VelocityWhitelist.getLang().getString("help-reload"))));
+                    List<LangKey.LangEntry> helpKeys = List.of(
+                            LangKey.HELP_ON,
+                            LangKey.HELP_OFF,
+                            LangKey.HELP_ADD,
+                            LangKey.HELP_REMOVE,
+                            LangKey.HELP_STATUS,
+                            LangKey.HELP_KICK,
+                            LangKey.HELP_RELOAD
+                    );
+
+                    MessageUtil.sendPrefix(source);
+                    for (LangKey.LangEntry key : helpKeys) {
+                        MessageUtil.sendNotPrefixed(source, configManager.getLang().get(key));
+                    }
 
                     return Command.SINGLE_SUCCESS;
                 })
-                .then(new OnCommand(proxy, config).getNode())
-                .then(new OffCommand(proxy, config).getNode())
-                .then(new AddCommand(proxy, config).getNode())
-                .then(new RemoveCommand(proxy, config).getNode())
-                .then(new StatusCommand(proxy, config).getNode())
-                .then(new ReloadCommand(config).getNode())
-                .then(new KickCommand(proxy, config).getNode())
+                .then(new OnCommand(proxy, configManager).getNode())
+                .then(new OffCommand(proxy, configManager).getNode())
+                .then(new AddCommand(proxy, configManager).getNode())
+                .then(new RemoveCommand(proxy, configManager).getNode())
+                .then(new StatusCommand(proxy, configManager).getNode())
+                .then(new ReloadCommand(configManager).getNode())
+                .then(new KickCommand(proxy, configManager).getNode())
                 .build();
 
         return new BrigadierCommand(chatNode);

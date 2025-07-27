@@ -1,5 +1,6 @@
-file-version: 1
+file-version: 2
 config: true
 lang: en
 kick-message: "&7You are not whitelisted on the &b{server} &7server."
 proxy-kick-message: "&cYou are not on the whitelist."
+prefix: "&9&l[VelocityWhitelist]"

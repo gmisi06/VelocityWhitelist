@@ -2,7 +2,6 @@ package me.gmisi.velocityWhitelist.utils;
 
 import com.velocitypowered.api.proxy.ProxyServer;
 import dev.dejvokep.boostedyaml.YamlDocument;
-import me.gmisi.velocityWhitelist.VelocityWhitelist;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -10,31 +9,34 @@ import java.util.ArrayList;
 
 public class ServersLoader {
 
-    public static void loadServers(ProxyServer proxy, Logger logger) {
-        YamlDocument config = VelocityWhitelist.getConfig();
+    public static void loadServers(ProxyServer proxy, ConfigManager configManager, Logger logger) {
 
-        if (!config.contains("servers.VelocityProxy")) {
-            config.set("servers.VelocityProxy.enabled", false);
-            config.set("servers.VelocityProxy.whitelisted", new ArrayList<String>());
-        }
+        ensureServerConfig(configManager.getConfig(), "VelocityProxy");
 
-        proxy.getAllServers().forEach(server -> {
-            String serverName = server.getServerInfo().getName();
-
-            if (!config.contains("servers." + serverName)) {
-                config.set("servers."+ serverName  +".enabled", false);
-                config.set("servers." + serverName + ".whitelisted", new ArrayList<String>());
-            }
-        });
+        proxy.getAllServers().forEach(server ->
+                ensureServerConfig(configManager.getConfig(), server.getServerInfo().getName())
+        );
 
         try {
-            config.update();
-            config.save();
+            configManager.getConfig().update();
+            configManager.getConfig().save();
         } catch (IOException e) {
             logger.error("Could not create servers list.");
         }
 
         logger.info("Loaded servers list.");
 
+    }
+
+    private static void ensureServerConfig(YamlDocument config, String serverName) {
+        String basePath = "servers." + serverName;
+
+        if (!config.contains(basePath + ".enabled")) {
+            config.set(basePath + ".enabled", false);
+        }
+
+        if (!config.contains(basePath + ".whitelisted")) {
+            config.set(basePath + ".whitelisted", new ArrayList<String>());
+        }
     }
 }
