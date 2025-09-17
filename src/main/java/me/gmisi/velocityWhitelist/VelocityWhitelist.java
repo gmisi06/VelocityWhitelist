@@ -24,7 +24,7 @@ import java.util.Optional;
 @Plugin(
         id = "VelocityWhitelist",
         name = "VelocityWhitelist",
-        version = "1.1.0-SNAPSHOT",
+        version = "1.1.1-SNAPSHOT",
         description = "A Velocity Proxy server whitelist plugin.",
         authors = {"gmisi"}
 )

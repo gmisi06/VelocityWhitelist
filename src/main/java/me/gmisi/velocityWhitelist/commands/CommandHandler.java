@@ -9,6 +9,7 @@ import me.gmisi.velocityWhitelist.commands.commands.*;
 import me.gmisi.velocityWhitelist.lang.LangKey;
 import me.gmisi.velocityWhitelist.utils.ConfigManager;
 import me.gmisi.velocityWhitelist.utils.MessageUtil;
+import me.gmisi.velocityWhitelist.utils.PermissionUtil;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class CommandHandler {
     public static BrigadierCommand createBrigadierCommand(final ProxyServer proxy, final String command, ConfigManager configManager) {
 
         LiteralCommandNode<CommandSource> chatNode = BrigadierCommand.literalArgumentBuilder(command)
-                .requires(source -> source.hasPermission(PERMISSION_ROOT))
+                .requires(source -> PermissionUtil.hasGlobal(source,"help"))
                 .executes(context -> {
                     CommandSource source = context.getSource();
 

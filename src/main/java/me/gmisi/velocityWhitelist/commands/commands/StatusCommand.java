@@ -11,7 +11,6 @@ import dev.dejvokep.boostedyaml.YamlDocument;
 import me.gmisi.velocityWhitelist.commands.SuggestUtil;
 import me.gmisi.velocityWhitelist.commands.VelocitySubCommand;
 import me.gmisi.velocityWhitelist.lang.LangKey;
-import me.gmisi.velocityWhitelist.utils.WhitelistManager;
 import me.gmisi.velocityWhitelist.utils.ConfigManager;
 import me.gmisi.velocityWhitelist.utils.MessageUtil;
 import me.gmisi.velocityWhitelist.utils.PermissionUtil;
@@ -96,7 +95,7 @@ public class StatusCommand implements VelocitySubCommand {
         }
 
         if (!PermissionUtil.hasServerPermission(source, "status", serverName)) {
-            MessageUtil.sendPrefixed(source, configManager.getLang().get(LangKey.STATUS_NO_PERM));
+            MessageUtil.sendPrefixed(source, configManager.getLang().getFormatted(LangKey.STATUS_NO_PERM, placeholders));
             return Command.SINGLE_SUCCESS;
         }
 
